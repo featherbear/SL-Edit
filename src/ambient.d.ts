@@ -37,3 +37,8 @@ declare module "*.webp" {
 	const value: string;
 	export default value;
 }
+
+import type { Logger } from 'winston'
+declare global {
+	var logger: Logger;
+}
