@@ -7,6 +7,7 @@ const { PORT, NODE_ENV } = process.env;
 const dev = NODE_ENV === 'development';
 
 import CC from '$controllers/ConsoleClient'
+import Storage from './components/Storage'
 
 import * as winston from 'winston'
 
