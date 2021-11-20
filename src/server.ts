@@ -1,3 +1,5 @@
+import dotenv from 'dotenv'
+dotenv.config()
 import sirv from 'sirv';
 import polka from 'polka';
 import compression from 'compression';
@@ -9,8 +11,10 @@ const dev = NODE_ENV === 'development';
 import CC from '$controllers/ConsoleClient'
 import Storage from './components/Storage'
 
+
 import * as winston from 'winston'
-import { CHANNELTYPES, CHANNELS, MESSAGETYPES } from 'presonus-studiolive-api';
+import { CHANNELTYPES, CHANNELS, MESSAGETYPES, ZlibPayload } from 'presonus-studiolive-api';
+import { Device, DeviceModel } from './models/Device';
 
 global.logger = winston.createLogger({
 	transports: [
@@ -29,24 +33,22 @@ polka()
 	})
 
 
-import zlib from 'zlib'
-
-
-
 
 let C = CC.createClient("192.168.0.18")
 C.connect()
 C.with((client) => {
-	client.on('data', function({code, data}) {
-		if (code == "ZB") {
-			// next 4 bytes are the size (little )
-			console.log("ZEE BEE");
-			let b = data.data.slice(4)
-			let defl = zlib.inflateSync(b)
-			console.log(defl.toString());
-			console.log(data);
+	client.on(MESSAGETYPES.ZLIB, function (d: ZlibPayload) {
+		const serial = d.children.global.values.mixer_serial
+
+		let mappedDevice = Device.findDeviceBySerial(serial)
+		if (!mappedDevice) {
+			logger.info("New device found")
+			Device.createDeviceFromZlibPayload(d)
+		} else {
+			logger.info("Connected to " + mappedDevice.data.id)
 		}
 	})
+
 	client.mute(CHANNELS.LINE.CHANNEL_1, CHANNELTYPES.LINE)
 	// setInterval(() => console.log(client.state), 1000)
 	// // client.on('data', (data) => {
@@ -55,3 +57,4 @@ C.with((client) => {
 	// // })
 
 })
+

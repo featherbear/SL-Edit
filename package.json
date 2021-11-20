@@ -14,8 +14,9 @@
     "compression": "^1.7.1",
     "nedb": "^1.8.0",
     "polka": "next",
-    "presonus-studiolive-api": "file:../presonus-studiolive-api",
+    "presonus-studiolive-api": "featherbear/presonus-studiolive-api",
     "sirv": "^1.0.0",
+    "uid": "^2.0.0",
     "winston": "^3.3.3"
   },
   "devDependencies": {
