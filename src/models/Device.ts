@@ -14,18 +14,19 @@ export interface DeviceModel {
 export class Device {
     data: DeviceModel
 
-    constructor(data?: DeviceModel) {
-        if (!data) return null; // FIXME: ?
+    constructor(data: DeviceModel) {
         this.data = data
     }
 
     static findDeviceBySerial(serial: string): Device {
-        return new this(Object.values(Storage.read().devices)
-            .find(({ serial: entrySerial }) => serial == entrySerial))
+        let deviceData = Object.values(Storage.read().devices)
+            .find(({ serial: entrySerial }) => serial == entrySerial)
+        return deviceData ? new this(deviceData) : null
     }
 
     static findDeviceByID(id: string): Device {
-        return new this(Storage.read().devices[id])
+        let deviceData = Storage.read().devices[id]
+        return deviceData ? new this(deviceData) : null
     }
 
     static createDeviceFromZlibPayload(payload: ZlibPayload) {
@@ -41,7 +42,7 @@ export class Device {
         let id
 
         let deviceData = {
-            id,
+             /* VOLATILE */ id: null,
             serial,
             mixer_name: payload.children.global.values.mixer_name,
             devicename: payload.children.global.values.devicename,
@@ -50,6 +51,7 @@ export class Device {
         }
         Storage.update(data => {
             while (Object.keys(data.devices).includes((id = uid(20))));
+            deviceData.id = id
             data.devices[id] = deviceData
         })
 
