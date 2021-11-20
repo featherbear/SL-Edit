@@ -2061,9 +2061,9 @@ postcss@^8.3.11:
     picocolors "^1.0.0"
     source-map-js "^0.6.2"
 
-presonus-studiolive-api@featherbear/presonus-studiolive-api:
-  version "1.0.1"
-  resolved "https://codeload.github.com/featherbear/presonus-studiolive-api/tar.gz/3f6e5e83fdfae08cf1f7d28dbc94dcd9dd78228e"
+presonus-studiolive-api@featherbear/presonus-studiolive-api#06cf4d676337f0af8d103d1be47a41b00cc394d6:
+  version "1.0.2"
+  resolved "https://codeload.github.com/featherbear/presonus-studiolive-api/tar.gz/06cf4d676337f0af8d103d1be47a41b00cc394d6"
   dependencies:
     queue "^6.0.1"
 
