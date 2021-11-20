@@ -1,12 +1,10 @@
-import API from 'presonus-studiolive-api'
-
-type ResponseType = {}
+import API, { DiscoveryType } from 'presonus-studiolive-api'
 
 // Singleton discovery
 let lastRequestTime = new Date(0);
 
-let lastResponse: ResponseType = {}
-let discoveryPromise: Promise<ResponseType>;
+let lastResponse: DiscoveryType[] = []
+let discoveryPromise: Promise<DiscoveryType[]>;
 
 export function search() {
     _search(true)
@@ -20,7 +18,7 @@ async function _search(updateTimestamp = false) {
 
     if (discoveryPromise) return discoveryPromise
 
-    discoveryPromise = API.discover(10 * 1000)
+    discoveryPromise = API.discover(6 * 1000)
     discoveryPromise.then(r => lastResponse = r)
     discoveryPromise.then(() => {
         discoveryPromise = null

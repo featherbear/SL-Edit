@@ -57,4 +57,8 @@ export class Device {
 
         return new this(deviceData)
     }
+
+    toJSON() {
+        return this.data
+    }
 }
