@@ -9,7 +9,6 @@ let lastResponse: ResponseType = {}
 let discoveryPromise: Promise<ResponseType>;
 
 export function search() {
-    console.log('spawn search');
     _search(true)
     return lastResponse
 }
@@ -19,13 +18,9 @@ async function _search(updateTimestamp = false) {
         lastRequestTime = new Date()
     }
 
-    if (discoveryPromise) {
-        console.log('return cached promise');
-        return discoveryPromise
-    }
-    
-    console.log('create new promise');
-    discoveryPromise = API.discover(5000)
+    if (discoveryPromise) return discoveryPromise
+
+    discoveryPromise = API.discover(10 * 1000)
     discoveryPromise.then(r => lastResponse = r)
     discoveryPromise.then(() => {
         discoveryPromise = null
