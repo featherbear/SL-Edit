@@ -4,11 +4,19 @@ import { uid } from 'uid'
 
 export interface DeviceModel {
     id: string
-    serial: string
-    mixer_name: string
-    devicename: string
-    mixer_version: string
-    mixer_version_date: string
+    sl_opts: {
+        friendly_name: string
+    }
+    internals: {
+        serial: string
+        devicename: string
+    }
+    cache?: {
+        [k: string]: any
+        // mixer_name: string
+        // mixer_version: string
+        // mixer_version_date: string
+    }
 }
 
 export class Device {
