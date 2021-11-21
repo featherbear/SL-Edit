@@ -1,7 +1,7 @@
 {
   "extends": "@tsconfig/svelte/tsconfig.json",
   "compilerOptions": {
-    "lib": ["DOM", "ES2017", "WebWorker"],
+    "lib": ["DOM", "ES2017", "ES2019", "WebWorker"],
     "baseUrl": ".",
     "paths": {
       "$controllers/*": ["src/components/controllers/*"]

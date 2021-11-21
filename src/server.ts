@@ -1,7 +1,8 @@
 import dotenv from 'dotenv'
 dotenv.config()
-import sirv from 'sirv';
 import polka from 'polka';
+import sirv from 'sirv';
+import { json } from 'body-parser'
 import compression from 'compression';
 import * as sapper from '@sapper/server';
 
@@ -19,6 +20,7 @@ import { Device, DeviceModel } from './models/Device';
 import { DeviceScanner } from './components/DeviceScanner';
 
 global.logger = winston.createLogger({
+	level: 'debug',
 	transports: [
 		new winston.transports.Console()
 	]
@@ -28,6 +30,7 @@ polka()
 	.use(
 		compression({ threshold: 0 }) as any,
 		sirv('static', { dev }),
+		json(),
 		sapper.middleware()
 	)
 	.listen(PORT, function () {
