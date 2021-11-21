@@ -15,7 +15,8 @@ import Storage from './components/Storage'
 import * as winston from 'winston'
 import { CHANNELTYPES, CHANNELS, MESSAGETYPES, ZlibPayload } from 'presonus-studiolive-api';
 import { Device, DeviceModel } from './models/Device';
-import { startDiscovery } from './components/DeviceScanner';
+
+import { DeviceScanner } from './components/DeviceScanner';
 
 global.logger = winston.createLogger({
 	transports: [
@@ -34,9 +35,14 @@ polka()
 	})
 
 
-startDiscovery();
+DeviceScanner.onDeviceFound(function (device) {
+	logger.debug(`Found device ${device.name} (SN: ${device.serial}) at ${device.ip}:${device.port}`)
+})
+DeviceScanner.onDeviceChanged(function ({ prev, cur }) {
+	logger.debug(`Device ${cur.name} (SN: ${cur.serial}) changed its address to ${cur.ip}:${cur.port}`)
+})
 
-let C = CC.createClient("192.168.0.18")
+DeviceScanner.startDiscovery();
 C.connect()
 C.with((client) => {
 	client.on(MESSAGETYPES.ZLIB, function (d: ZlibPayload) {
