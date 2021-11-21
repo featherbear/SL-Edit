@@ -1,30 +1,25 @@
-import API, { DiscoveryType } from 'presonus-studiolive-api'
+import type { DiscoveryType } from 'presonus-studiolive-api'
+import { Discovery } from 'presonus-studiolive-api'
 
-// Singleton discovery
-let lastRequestTime = new Date(0);
+let discoveryMap: {
+    [uid: string]: DiscoveryType
+} = {};
 
-let lastResponse: DiscoveryType[] = []
-let discoveryPromise: Promise<DiscoveryType[]>;
+let discoveryClient: Discovery = new Discovery()
+discoveryClient.on('discover', function (obj: DiscoveryType) {
+    discoveryMap[obj.serial] = obj
+})
 
-export function search() {
-    _search(true)
-    return lastResponse
+export function startDiscovery() {
+    stopDiscovery()
+    discoveryClient.start();
+    logger.info("Started discovery service")
 }
 
-async function _search(updateTimestamp = false) {
-    if (updateTimestamp) {
-        lastRequestTime = new Date()
-    }
+export function stopDiscovery() {
+    discoveryClient.stop()
+}
 
-    if (discoveryPromise) return discoveryPromise
-
-    discoveryPromise = API.discover(6 * 1000)
-    discoveryPromise.then(r => lastResponse = r)
-    discoveryPromise.then(() => {
-        discoveryPromise = null
-        // Repeat search if a request was made at least once since 20 seconds ago
-        if (new Date().getTime() - lastRequestTime.getTime() < 20 * 1000) _search()
-    })
-
-    return discoveryPromise
+export function search() {
+    return Object.values(discoveryMap)
 }

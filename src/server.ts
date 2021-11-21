@@ -15,6 +15,7 @@ import Storage from './components/Storage'
 import * as winston from 'winston'
 import { CHANNELTYPES, CHANNELS, MESSAGETYPES, ZlibPayload } from 'presonus-studiolive-api';
 import { Device, DeviceModel } from './models/Device';
+import { startDiscovery } from './components/DeviceScanner';
 
 global.logger = winston.createLogger({
 	transports: [
@@ -33,6 +34,7 @@ polka()
 	})
 
 
+startDiscovery();
 
 let C = CC.createClient("192.168.0.18")
 C.connect()
