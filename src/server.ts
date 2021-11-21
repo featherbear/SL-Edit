@@ -43,26 +43,28 @@ DeviceScanner.onDeviceChanged(function ({ prev, cur }) {
 })
 
 DeviceScanner.startDiscovery();
-C.connect()
-C.with((client) => {
-	client.on(MESSAGETYPES.ZLIB, function (d: ZlibPayload) {
-		const serial = d.children.global.values.mixer_serial
 
-		let mappedDevice = Device.findDeviceBySerial(serial)
-		if (!mappedDevice) {
-			logger.info("New device found")
-			Device.createDeviceFromZlibPayload(d)
-		} else {
-			logger.info("Connected to " + mappedDevice.data.id)
-		}
-	})
+// let C = CC.createClient("192.168.0.18")
+// C.connect()
+// C.with((client) => {
+// 	client.on(MESSAGETYPES.ZLIB, function (d: ZlibPayload) {
+// 		const serial = d.children.global.values.mixer_serial
 
-	client.mute(CHANNELS.LINE.CHANNEL_1, CHANNELTYPES.LINE)
-	// setInterval(() => console.log(client.state), 1000)
-	// // client.on('data', (data) => {
-	// // 	console.log(data);
-	// // 	console.log(client.state);
-	// // })
+// 		let mappedDevice = Device.findDeviceBySerial(serial)
+// 		if (!mappedDevice) {
+// 			logger.info("New device found")
+// 			Device.createDeviceFromZlibPayload(d)
+// 		} else {
+// 			logger.info("Connected to " + mappedDevice.data.id)
+// 		}
+// 	})
 
-})
+// 	client.mute(CHANNELS.LINE.CHANNEL_1, CHANNELTYPES.LINE)
+// 	// setInterval(() => console.log(client.state), 1000)
+// 	// // client.on('data', (data) => {
+// 	// // 	console.log(data);
+// 	// // 	console.log(client.state);
+// 	// // })
+
+// })
 
