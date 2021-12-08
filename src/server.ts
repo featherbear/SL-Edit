@@ -9,7 +9,6 @@ import * as sapper from '@sapper/server';
 const { PORT, NODE_ENV } = process.env;
 const dev = NODE_ENV === 'development';
 
-import CC from '$controllers/ConsoleClient'
 import Storage from './components/Storage'
 
 
@@ -38,36 +37,19 @@ polka()
 	})
 
 
-DeviceScanner.onDeviceFound(function (device) {
-	logger.debug(`Found device ${device.name} (SN: ${device.serial}) at ${device.ip}:${device.port}`)
+DeviceScanner.onDeviceFound(function (deviceDiscovery) {
+	const existingDevice = Device.findDeviceBySerial(deviceDiscovery.serial)
+	const isNewString = existingDevice ? "" : "new "
+	logger.debug(`Found ${isNewString}device ${deviceDiscovery.name} (SN: ${deviceDiscovery.serial}) at ${deviceDiscovery.ip}:${deviceDiscovery.port}`)
+
+	existingDevice?.notifyAddress(deviceDiscovery.ip, deviceDiscovery.port)
 })
+
 DeviceScanner.onDeviceChanged(function ({ prev, cur }) {
 	logger.debug(`Device ${cur.name} (SN: ${cur.serial}) changed its address to ${cur.ip}:${cur.port}`)
+	Device.findDeviceBySerial(cur.serial)?.notifyAddress(cur.ip, cur.port)
 })
 
 DeviceScanner.startDiscovery();
 
-// let C = CC.createClient("192.168.0.18")
-// C.connect()
-// C.with((client) => {
-// 	client.on(MESSAGETYPES.ZLIB, function (d: ZlibPayload) {
-// 		const serial = d.children.global.values.mixer_serial
-
-// 		let mappedDevice = Device.findDeviceBySerial(serial)
-// 		if (!mappedDevice) {
-// 			logger.info("New device found")
-// 			Device.createDeviceFromZlibPayload(d)
-// 		} else {
-// 			logger.info("Connected to " + mappedDevice.data.id)
-// 		}
-// 	})
-
-// 	client.mute(CHANNELS.LINE.CHANNEL_1, CHANNELTYPES.LINE)
-// 	// setInterval(() => console.log(client.state), 1000)
-// 	// // client.on('data', (data) => {
-// 	// // 	console.log(data);
-// 	// // 	console.log(client.state);
-// 	// // })
-
-// })
 

@@ -2,6 +2,8 @@ import type { DiscoveryType, ZlibPayload } from "presonus-studiolive-api"
 import Storage from "../components/Storage"
 import { uid } from 'uid'
 
+import CC, { ConsoleClientConnector } from '../components/controllers/ConsoleClient'
+
 export interface DeviceModel {
     id: string
     sl_opts: {
@@ -19,11 +21,67 @@ export interface DeviceModel {
     }
 }
 
+let ConsoleClientConnectorMap: { [deviceID: string]: ConsoleClientConnector } = {}
+const findConnector = (deviceID: string) => ConsoleClientConnectorMap[deviceID]
+
+
 export class Device {
     data: DeviceModel
+    #client: ConsoleClientConnector
 
     constructor(data: DeviceModel) {
         this.data = data
+    }
+
+    notifyAddress(host: string, port: number) {
+        let connector = findConnector(this.data.id)
+        if (!connector || connector.host !== host || connector.port !== port) {
+            const wasOldClientConnected = !!connector?.isConnected
+            connector = ConsoleClientConnectorMap[this.data.id] = CC.createClient(host, port)
+            if (wasOldClientConnected) findConnector(this.data.id).connect()
+
+            connector.with(client => {
+                client.once('connected', () => {
+                    logger.info(`Connected to ${this.data.internals.serial}`)
+                })
+            })
+        }
+    }
+
+    async getInstance() {
+        const existingConnector = findConnector(this.data.id)
+        if (!existingConnector) {
+            logger.debug(`Tried get instance for ${this.data.internals.serial} but the device was not associated with an address yet`)
+            return null;
+        }
+        if (!existingConnector.isConnected) {
+            logger.debug(`Waiting for connection to ${this.data.internals.serial}`)
+            await existingConnector.connect()
+        }
+
+        return existingConnector
+        // C.connect()
+        // C.with((client) => {
+        // 	client.on(MESSAGETYPES.ZLIB, function (d: ZlibPayload) {
+        // 		const serial = d.children.global.values.mixer_serial
+
+        // 		let mappedDevice = Device.findDeviceBySerial(serial)
+        // 		if (!mappedDevice) {
+        // 			logger.info("New device found")
+        // 			Device.createDeviceFromZlibPayload(d)
+        // 		} else {
+        // 			logger.info("Connected to " + mappedDevice.data.id)
+        // 		}
+        // 	})
+
+        // 	client.mute(CHANNELS.LINE.CHANNEL_1, CHANNELTYPES.LINE)
+        // 	// setInterval(() => console.log(client.state), 1000)
+        // 	// // client.on('data', (data) => {
+        // 	// // 	console.log(data);
+        // 	// // 	console.log(client.state);
+        // 	// // })
+
+        // })
     }
 
     static findDeviceBySerial(serial: string): Device {
@@ -52,7 +110,7 @@ export class Device {
             internals: {
                 serial,
                 devicename
-            },
+            }
         }
 
         Storage.update(data => {

@@ -1,5 +1,11 @@
 import SLAPI from 'presonus-studiolive-api'
 
+/**
+ * 
+ * @param host 
+ * @param port default 53000
+ * @returns 
+ */
 export function createClient(host: string, port?: number) {
     function requireConnected(target, name, descriptor) {
         return {
@@ -17,18 +23,33 @@ export function createClient(host: string, port?: number) {
     class ConsoleClientConnector {
         #connected: boolean
         #client: SLAPI
+        #host: string
+        #port: number
 
         constructor() {
             this.#connected = false
             this.#client = new SLAPI(host, port)
+            this.#host = host
+            this.#port = port
+        }
+
+        get host() {
+            return this.#host
+        }
+
+        get port() {
+            return this.#port
         }
 
         get isConnected() {
-            return this.#connected;
+            return this.#connected
         }
 
         connect() {
-            this.#client.connect()
+            this.#client.connect().then(() => {
+                this.#connected = true
+            })
+            // Wait for the connect event? or just be a promise
         }
 
         with(fn: (client: SLAPI) => any ) {
@@ -43,6 +64,8 @@ export function createClient(host: string, port?: number) {
 
     return (client = new ConsoleClientConnector);
 }
+
+export type ConsoleClientConnector = ReturnType<typeof createClient>
 
 export default {
     createClient
