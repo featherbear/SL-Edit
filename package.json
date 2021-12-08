@@ -16,7 +16,7 @@
     "dotenv": "^10.0.0",
     "nedb": "^1.8.0",
     "polka": "next",
-    "presonus-studiolive-api": "featherbear/presonus-studiolive-api#9b9635d9824551f9509576d0d6ff2be5ebc11f2a",
+    "presonus-studiolive-api": "featherbear/presonus-studiolive-api#fb289d457f27a0134be71474f19eb185642955f4",
     "sirv": "^1.0.0",
     "uid": "^2.0.0",
     "winston": "^3.3.3"
