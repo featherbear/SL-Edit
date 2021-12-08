@@ -1,3 +1,4 @@
+import type { ConsoleClientConnector } from "$controllers/ConsoleClient";
 import { Device } from "../../../models/Device"
 
 export async function get(req, res, next) {
@@ -6,8 +7,13 @@ export async function get(req, res, next) {
     let device = Device.findDeviceByID(deviceID)
     if (!device) return next()
 
-    // TODO: wait for time.. or let it get changed into another value?
-    device.getInstance()
+    // Fetch the client connector, max 1s wait
+    let client: ConsoleClientConnector = await new Promise((resolve, reject) => {
+        setTimeout(() => resolve(null), 1000)
+        device.getInstance().then(client => {
+            resolve(client)
+        })
+    });
 
     return res.end(JSON.stringify(device.data))
 }
