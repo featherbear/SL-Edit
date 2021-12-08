@@ -40,5 +40,6 @@ export function post(req, res, next) {
 
     if (!deviceID) return FAIL("An unknown error occurred")
 
+    logger.info(`Device ${args.serial} registered`)
     res.end(JSON.stringify({ status: true, deviceID } as RegistrationSuccessResponse))
 }
