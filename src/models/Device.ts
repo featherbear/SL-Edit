@@ -95,7 +95,7 @@ export class Device {
         return deviceData ? new this(deviceData) : null
     }
 
-    private static createDevice({ friendly_name = "", serial, devicename }) {
+    private static createDevice({ friendly_name = "", serial, devicename, host = null, port = null }) {
         let existingDevice = this.findDeviceBySerial(serial)
         if (existingDevice) {
             throw new Error("Tried to create device but serial is already associated to another device")
@@ -119,11 +119,14 @@ export class Device {
             data.devices[id] = deviceData
         })
 
-        return new this(deviceData)
+        let instance = new this(deviceData)
+        if (host && port) instance.notifyAddress(host, port)
+
+        return instance
     }
 
     static createDeviceFromDiscoveryPayload(payload: DiscoveryType, friendly_name?: string) {
-        return this.createDevice({ devicename: payload.name, serial: payload.serial, friendly_name })
+        return this.createDevice({ devicename: payload.name, serial: payload.serial, friendly_name, host: payload.ip, port: payload.port })
     }
 
     static createDeviceFromZlibPayload(payload: ZlibPayload, friendly_name?: string) {
